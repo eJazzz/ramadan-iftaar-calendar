@@ -7,6 +7,7 @@ import { z } from "zod";
 const updateSchema = z.object({
     id: z.string(),
     hostNames: z.string().optional(),
+    hostPhone: z.string().optional(),
     notes: z.string().optional(),
     clearRequest: z.boolean().optional(),
 });
@@ -20,14 +21,16 @@ export async function PUT(req: Request) {
 
     try {
         const body = await req.json();
-        const { id, hostNames, notes, clearRequest } = updateSchema.parse(body);
+        const { id, hostNames, hostPhone, notes, clearRequest } = updateSchema.parse(body);
 
+        // Admin can update host names, phone, notes, and clear the edit request
         await prisma.reservation.update({
             where: { id },
             data: {
                 hostNames: hostNames || undefined,
+                hostPhone: hostPhone || undefined,
                 notes: notes || undefined,
-                editRequest: clearRequest ? null : undefined, // Clearing the request to null if flag is true
+                editRequest: clearRequest ? null : undefined,
             } as any
         });
 

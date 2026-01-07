@@ -38,69 +38,55 @@ export default function AdminControls({ reservation }: AdminControlsProps) {
         }
     };
 
-    const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsLoading(true);
-        const formData = new FormData(e.currentTarget);
-        const data = {
-            id: reservation.id,
-            hostNames: formData.get("hostNames"),
-            notes: formData.get("notes"),
-            clearRequest: true,
-        };
-
-        try {
-            await fetch(`/api/admin/reservations`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-            });
-            setIsEditOpen(false);
-            router.refresh();
-        } catch (e) {
-            alert("Failed to update");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     return (
-        <div className="mt-2 pt-2 border-t border-primary/10 flex flex-col gap-2">
-            {reservation.editRequest && (
-                <div className="bg-orange-100 dark:text-black p-2 rounded text-xs border border-orange-200">
-                    <strong>Request:</strong> {reservation.editRequest}
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <div className="flex gap-2 mt-2 pt-2 border-t border-primary/10">
+                    <Button variant="outline" size="sm" className="h-7 text-xs w-full">
+                        <Edit className="w-3 h-3 mr-1" /> Edit
+                    </Button>
+                    <Button variant="destructive" size="sm" className="h-7 text-xs px-2" onClick={(e) => { e.stopPropagation(); handleDelete(); }} disabled={isLoading}>
+                        <Trash2 className="w-3 h-3 mr-1" /> Delete
+                    </Button>
                 </div>
-            )}
-            <div className="flex gap-2 justify-end">
-                <Button variant="outline" size="sm" onClick={() => setIsEditOpen(true)} className="h-7 text-xs">
-                    <Edit className="w-3 h-3 mr-1" /> Edit
-                </Button>
-                <Button variant="destructive" size="sm" onClick={handleDelete} disabled={isLoading} className="h-7 text-xs">
-                    <Trash2 className="w-3 h-3 mr-1" /> Delete
-                </Button>
-            </div>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Edit Reservation</DialogTitle>
+                    <DialogDescription>
+                        Modify details for {new Date(reservation.date).toDateString()}
+                    </DialogDescription>
+                </DialogHeader>
 
-            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Admin Edit</DialogTitle>
-                        <DialogDescription>Modify reservation details directly.</DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleUpdate} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label>Host Names (Display)</Label>
-                            <Input name="hostNames" defaultValue={reservation.hostNames || ""} placeholder="Custom Host Names..." />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Notes</Label>
-                            <Input name="notes" defaultValue={reservation.notes || ""} />
-                        </div>
-                        <DialogFooter>
-                            <Button type="submit" disabled={isLoading}>Save Changes</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-        </div>
+                {reservation.editRequest && (
+                    <div className="bg-orange-100 dark:text-black p-2 rounded text-xs border border-orange-200">
+                        <strong>Request:</strong> {reservation.editRequest}
+                    </div>
+                )}
+
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label>Host Display Name(s)</Label>
+                        <Input value={hostNames} onChange={(e) => setHostNames(e.target.value)} placeholder="e.g. Family of..." />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Host Phone</Label>
+                        <Input value={hostPhone} onChange={(e) => setHostPhone(e.target.value)} placeholder="e.g. 727-555-0123" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Notes (Internal/Admin)</Label>
+                        <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. Paid via Zelle" />
+                    </div>
+                </div>
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
+                    <Button onClick={handleUpdate} disabled={isLoading}>
+                        {isLoading ? "Saving..." : "Save Changes"}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 }
+```

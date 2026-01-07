@@ -27,6 +27,7 @@ model Reservation {
   user      User     @relation(fields: [userId], references: [id])
   coHosts   String?  // Legacy field
   hostNames String?  // The display name(s) for the hosts
+  hostPhone String?  // Contact phone for the host
   notes     String?
   editRequest String? // User's request message to admin
   createdAt DateTime @default(now())

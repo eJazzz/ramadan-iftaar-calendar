@@ -172,19 +172,13 @@ function DayCard({ date, islamicDay, reservation, isAdmin }: { date: Date; islam
                             </span>
                         </div>
 
-                        {/* Added By & Phone */}
-                        <div className="flex flex-col gap-0.5 text-xs text-muted-foreground border-t border-primary/5 pt-1">
-                            <div className="flex items-center gap-1">
-                                <span>Added By:</span>
-                                <span className="font-medium">{reservation.user.name}</span>
+                        {/* Host Phone Display */}
+                        {reservation.hostPhone && (
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground border-t border-primary/5 pt-1 mt-1">
+                                <span className="opacity-70 font-semibold">Ph:</span>
+                                <span className="font-mono">{reservation.hostPhone}</span>
                             </div>
-                            {reservation.user.phone && (
-                                <div className="flex items-center gap-1">
-                                    <span className="opacity-70">Ph:</span>
-                                    <span className="font-mono">{reservation.user.phone}</span>
-                                </div>
-                            )}
-                        </div>
+                        )}
 
                         {isAdmin && <AdminControls reservation={reservation} />}
                     </div>
