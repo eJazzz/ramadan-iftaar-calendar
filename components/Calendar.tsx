@@ -61,26 +61,50 @@ export default function Calendar({ reservations, startDate }: CalendarProps) {
         setIsModalOpen(true);
     };
 
+    const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    // Calculate offest: getDay() returns 0 for Sun, 1 for Mon...
+    // We want Mon=0, ... Sun=6
+    const startDayIndex = (ramadanStart.getDay() + 6) % 7;
+    const paddingDays = Array.from({ length: startDayIndex });
+
     return (
         <>
             {isAdmin && <AdminSettings currentStartDate={startDate} />}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {days.map((date, index) => {
-                    const dateStr = format(date, "yyyy-MM-dd");
-                    const reservation = reservations.find(r =>
-                        format(new Date(r.date), "yyyy-MM-dd") === dateStr
-                    );
-
-                    // Calculate Islamic Date: simple index + 1 since start date is Ramadan 1st
-                    const islamicDay = index + 1;
-
-                    return (
-                        <div key={dateStr} onClick={() => handleDayClick(date, reservation)}>
-                            <DayCard date={date} islamicDay={islamicDay} reservation={reservation} isAdmin={isAdmin} />
+            <div className="w-full max-w-7xl mx-auto">
+                {/* Weekday Headers */}
+                <div className="grid grid-cols-7 gap-4 mb-4 text-center">
+                    {WEEKDAYS.map(day => (
+                        <div key={day} className="font-bold text-muted-foreground uppercase tracking-wider text-sm">
+                            {day}
                         </div>
-                    );
-                })}
+                    ))}
+                </div>
+
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                    {/* Padding for empty days at start of month (Desktop only usually, but good for grid alignment) */}
+                    {paddingDays.map((_, i) => (
+                        <div key={`padding-${i}`} className="hidden md:block h-full bg-white/5 rounded-lg border border-transparent" />
+                    ))}
+
+                    {days.map((date, index) => {
+                        const dateStr = format(date, "yyyy-MM-dd");
+                        const reservation = reservations.find(r =>
+                            format(new Date(r.date), "yyyy-MM-dd") === dateStr
+                        );
+
+                        // Calculate Islamic Date: simple index + 1 since start date is Ramadan 1st
+                        const islamicDay = index + 1;
+
+                        return (
+                            <div key={dateStr} onClick={() => handleDayClick(date, reservation)}>
+                                <DayCard date={date} islamicDay={islamicDay} reservation={reservation} isAdmin={isAdmin} />
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Modals ... */}
