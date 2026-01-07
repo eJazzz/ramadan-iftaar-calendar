@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Reservation } from "@prisma/client";
 import { Trash2, Edit } from "lucide-react";
 import {
     Dialog,
@@ -14,22 +13,61 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 
 type AdminControlsProps = {
-    reservation: any; // Using any temporarily to bypass generic Prisma type lag
+    reservation: any;
 };
 
 export default function AdminControls({ reservation }: AdminControlsProps) {
     const router = useRouter();
-    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    // State for controlled inputs
+    const [hostNames, setHostNames] = useState(reservation.hostNames || "");
+    const [hostPhone, setHostPhone] = useState(reservation.hostPhone || "");
+    const [notes, setNotes] = useState(reservation.notes || "");
+
+    const handleUpdate = async () => {
+        setIsLoading(true);
+        try {
+            const res = await fetch("/api/admin/reservations", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: reservation.id,
+                    hostNames,
+                    hostPhone,
+                    notes,
+                    clearRequest: true
+                })
+            });
+
+            if (res.ok) {
+                setIsOpen(false);
+                router.refresh();
+            } else {
+                alert("Failed to update");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error updating reservation");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleDelete = async () => {
         if (!confirm("Are you sure you want to DELETE this reservation?")) return;
         setIsLoading(true);
         try {
-            await fetch(`/api/admin/reservations?id=${reservation.id}`, { method: "DELETE" });
+            await fetch("/api/admin/reservations", { // Fixed endpoint usage
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: reservation.id })
+            });
             router.refresh();
         } catch (e) {
             alert("Failed to delete");
@@ -89,4 +127,3 @@ export default function AdminControls({ reservation }: AdminControlsProps) {
         </Dialog>
     );
 }
-```
