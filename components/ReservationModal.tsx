@@ -35,7 +35,8 @@ export default function ReservationModal({ date, isOpen, onClose }: ReservationM
         const formData = new FormData(e.currentTarget);
         const data = {
             date: date.toISOString(),
-            coHosts: formData.get("coHosts") as string,
+            hostNames: formData.get("hostNames") as string,
+            hostPhone: formData.get("hostPhone") as string,
             notes: formData.get("notes") as string,
         };
 
@@ -71,13 +72,24 @@ export default function ReservationModal({ date, isOpen, onClose }: ReservationM
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="coHosts" className="text-right">
-                            Co-Hosts
+                        <Label htmlFor="hostNames" className="text-right">
+                            Host Names
                         </Label>
                         <Input
-                            id="coHosts"
-                            name="coHosts"
-                            placeholder="e.g. Family A, Family B"
+                            id="hostNames"
+                            name="hostNames"
+                            placeholder="e.g. Family of..."
+                            className="col-span-3"
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="hostPhone" className="text-right">
+                            Host Phone
+                        </Label>
+                        <Input
+                            id="hostPhone"
+                            name="hostPhone"
+                            placeholder="e.g. 727-555-0123"
                             className="col-span-3"
                         />
                     </div>

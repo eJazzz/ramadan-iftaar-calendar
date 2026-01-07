@@ -6,7 +6,8 @@ import { z } from "zod";
 
 const reservationSchema = z.object({
     date: z.string().datetime(), // Expect ISO string
-    coHosts: z.string().optional(),
+    hostNames: z.string().optional(),
+    hostPhone: z.string().optional(),
     notes: z.string().optional(),
 });
 
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const { date, coHosts, notes } = reservationSchema.parse(body);
+        const { date, hostNames, hostPhone, notes } = reservationSchema.parse(body);
 
         // Check if date is already reserved
         const existing = await prisma.reservation.findUnique({
@@ -34,7 +35,8 @@ export async function POST(req: Request) {
             data: {
                 date: new Date(date),
                 userId: (session.user as any).id,
-                coHosts,
+                hostNames,
+                hostPhone,
                 notes,
             },
         });
