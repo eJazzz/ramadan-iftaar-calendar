@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL") // Vercel specific URL
+  directUrl = env("POSTGRES_URL_NON_POOLING") // Direct connection
+}
+
+model User {
+  id        String        @id @default(uuid())
+  name      String
+  email     String        @unique
+  password  String
+  phone     String?
+  role      String        @default("USER") // "USER" or "ADMIN"
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  
+  reservations Reservation[]
+}
+
+model Reservation {
+  id        String   @id @default(uuid())
+  date      DateTime @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  coHosts   String?  // Legacy field
+  hostNames String?  // The display name(s) for the hosts
+  notes     String?
+  editRequest String? // User's request message to admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GlobalSettings {
+  key   String @id
+  value String
+}
