@@ -166,19 +166,24 @@ function DayCard({ date, islamicDay, reservation, isAdmin }: { date: Date; islam
                         {/* Main Hosts Display */}
                         <div className="flex flex-col">
                             <span className="text-[10px] font-bold tracking-widest text-primary/60 uppercase">Hosts</span>
-                            <span className="font-bold text-lg leading-tight text-foreground line-clamp-2">
+                            {/* Reduced font size and removed line clamp to show full names */}
+                            <span className="font-bold text-sm leading-tight text-foreground break-words">
                                 {reservation.hostNames || reservation.user.name}
                             </span>
-                            {/* Fallback for old coHosts field if hostNames empty but coHosts exists? 
-                         We can just append them in logic or here. 
-                         For now adhering to 'hostNames' field as primary display per request.
-                     */}
                         </div>
 
-                        {/* Added By (Account Name) */}
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground border-t border-primary/5 pt-1">
-                            <span>Added By:</span>
-                            <span className="font-medium">{reservation.user.name}</span>
+                        {/* Added By & Phone */}
+                        <div className="flex flex-col gap-0.5 text-xs text-muted-foreground border-t border-primary/5 pt-1">
+                            <div className="flex items-center gap-1">
+                                <span>Added By:</span>
+                                <span className="font-medium">{reservation.user.name}</span>
+                            </div>
+                            {reservation.user.phone && (
+                                <div className="flex items-center gap-1">
+                                    <span className="opacity-70">Ph:</span>
+                                    <span className="font-mono">{reservation.user.phone}</span>
+                                </div>
+                            )}
                         </div>
 
                         {isAdmin && <AdminControls reservation={reservation} />}

@@ -17,7 +17,9 @@ export default function AdminSettings({ currentStartDate }: { currentStartDate: 
         setIsLoading(true);
 
         try {
-            const isoDate = new Date(date).toISOString();
+            // Append T12:00:00.000Z to ensure it stays on the same day for Western Hemisphere users
+            // (Avoids the 00:00 UTC -> Previous Day EST issue)
+            const isoDate = `${date}T12:00:00.000Z`;
             const res = await fetch("/api/admin/settings", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
